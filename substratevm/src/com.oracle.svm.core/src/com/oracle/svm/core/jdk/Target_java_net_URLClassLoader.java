@@ -29,12 +29,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLConnection;
 import java.security.AccessControlContext;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
+import com.oracle.svm.core.SubstrateUtil;
 import com.oracle.svm.core.annotate.Alias;
 import com.oracle.svm.core.annotate.RecomputeFieldValue;
 import com.oracle.svm.core.annotate.Substitute;
@@ -79,7 +81,17 @@ final class Target_java_net_URLClassLoader {
     private WeakHashMap<Closeable, Void> closeables;
 
     @Substitute
-    public InputStream getResourceAsStream(String name) throws IOException {
-        return Resources.createInputStream(name);
+    public InputStream getResourceAsStream(String name) {
+        ClassLoader cl = SubstrateUtil.cast(this, ClassLoader.class);
+        URL url = cl.getResource(name);
+        try {
+            if (url == null) {
+                return null;
+            }
+            URLConnection urlc = url.openConnection();
+            return urlc.getInputStream();
+        } catch (IOException e) {
+            return null;
+        }
     }
 }
