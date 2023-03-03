@@ -25,6 +25,7 @@ This changelog summarizes major changes to GraalVM Native Image.
 * (GR-38414) BellSoft implemented the `MemoryPoolMXBean` for the serial and epsilon GCs.
 * (GR-40641) Dynamic linking of AWT libraries on Linux.
 * (GR-40463) Red Hat added experimental support for JMX, which can be enabled with the `--enable-monitoring` option (e.g. `--enable-monitoring=jmxclient,jmxserver`).
+* (GR-35746) Lower the default aligned chunk size from 1 MB to 512 KB for the serial and epsilon GCs, reducing memory usage and image size in many cases.
 
 ## Version 22.3.0
 * (GR-35721) Remove old build output style and the `-H:±BuildOutputUseNewStyle` option.
