@@ -27,8 +27,7 @@ package com.oracle.svm.hosted.util;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.graalvm.nativeimage.Platform;
-
+import com.oracle.svm.core.SubstrateUtil;
 import com.oracle.svm.hosted.NativeImageOptions;
 
 public interface CPUType {
@@ -40,13 +39,14 @@ public interface CPUType {
     CPUType getParent();
 
     static void printList() {
-        if (Platform.includedIn(Platform.AMD64.class)) {
-            print("AMD64", CPUTypeAMD64.values());
-        } else if (Platform.includedIn(Platform.AARCH64.class)) {
-            print("AArch64", CPUTypeAArch64.values());
-            CPUTypeAArch64.printFeatureModifiers();
-        } else {
-            throw new UnsupportedOperationException("");
+        String arch = SubstrateUtil.getArchitectureName();
+        switch (arch) {
+            case "amd64" -> print("AMD64", CPUTypeAMD64.values());
+            case "aarch64" -> {
+                print("AArch64", CPUTypeAArch64.values());
+                CPUTypeAArch64.printFeatureModifiers();
+            }
+            default -> throw new UnsupportedOperationException("Unsupported platform: " + arch);
         }
     }
 
@@ -73,12 +73,13 @@ public interface CPUType {
         String userValue = NativeImageOptions.MicroArchitecture.getValue();
         if (userValue != null) {
             return userValue;
-        } else if (Platform.includedIn(Platform.AMD64.class)) {
-            return CPUTypeAMD64.getDefaultName(false);
-        } else if (Platform.includedIn(Platform.AARCH64.class)) {
-            return CPUTypeAArch64.getDefaultName();
         } else {
-            return "unknown";
+            String arch = SubstrateUtil.getArchitectureName();
+            return switch (arch) {
+                case "amd64" -> CPUTypeAMD64.getDefaultName(false);
+                case "aarch64" -> CPUTypeAArch64.getDefaultName();
+                default -> "unknown";
+            };
         }
     }
 }
