@@ -623,29 +623,29 @@ static uint32_t cpu_has(const char* optional) {
 }
 
 void determineCPUFeatures(CPUFeatures* features) {
-  /*
-   * Note that Apple HW detection code is not accurate on older processors.
-   * All Apple devices have FP and ASIMD.
-   */
+  // All Apple devices have FP and ASIMD.
   features->fFP = 1;
   features->fASIMD = 1;
+  // All Apple-darwin Arm processors have AES, PMULL, SHA1, and SHA2.
+  features->fAES = 1;
+  features->fPMULL = 1;
+  features->fSHA1 = 1;
+  features->fSHA2 = 1;
+  // https://developer.arm.com/downloads/-/exploration-tools/feature-names-for-a-profile
+  features->fCRC32 =      !!(cpu_has("hw.optional.FEAT_CRC32"))      | !!(cpu_has("hw.optional.armv8_crc32"));
+  features->fLSE =        !!(cpu_has("hw.optional.arm.FEAT_LSE"))    | !!(cpu_has("hw.optional.armv8_1_atomics"));
+  features->fDCPOP =      !!(cpu_has("hw.optional.arm.FEAT_DPB"));
+  features->fSHA3 =       !!(cpu_has("hw.optional.arm.FEAT_SHA3"))   | !!(cpu_has("hw.optional.armv8_2_sha3"));
+  features->fSHA512 =     !!(cpu_has("hw.optional.arm.FEAT_SHA512")) | !!(cpu_has("hw.optional.armv8_2_sha512"));
+  features->fSVE =        !!(cpu_has("hw.optional.arm.FEAT_SVE"));
+  features->fSVEBITPERM = !!(cpu_has("hw.optional.arm.FEAT_SVE_BitPerm"));
+  features->fSVE2 =       !!(cpu_has("hw.optional.arm.FEAT_SVE2"));
+  // Unsupported
   features->fEVTSTRM = 0;
-  features->fAES = 0;
-  features->fPMULL = 0;
-  features->fSHA1 = 0;
-  features->fSHA2 = 0;
-  features->fCRC32 = !!(cpu_has("hw.optional.armv8_crc32"));
-  features->fLSE = !!(cpu_has("hw.optional.armv8_1_atomics"));
-  features->fDCPOP = 0;
-  features->fSHA3 = 0;
-  features->fSHA512 = 0;
-  features->fSVE = 0;
-  features->fSVE2 = 0;
   features->fSTXR_PREFETCH = 0;
   features->fA53MAC = 0;
   features->fDMB_ATOMICS = 0;
   features->fPACA = 0;
-  features->fSVEBITPERM = 0;
 }
 
 /*
